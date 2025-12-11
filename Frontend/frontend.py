@@ -1,0 +1,48 @@
+import gradio as gr
+import requests
+
+FASTAPI_URL = "http://127.0.0.1:8000/voice/chat" 
+
+def send_audio(audio):
+    """
+    audio = (sample_rate, numpy_array)
+    Gradio fournit l'audio brut.
+    On l'encode en WAV et on l'envoie au backend.
+    """
+    if audio is None:
+        return "Aucun audio reçu."
+
+    sr, data = audio
+
+    # Gradio fournit un numpy array → convertir en WAV en mémoire
+    import soundfile as sf
+    import io
+
+    buffer = io.BytesIO()
+    sf.write(buffer, data, sr, format="WAV")
+    buffer.seek(0)
+
+    files = {"file": ("audio.wav", buffer, "audio/wav")}
+    response = requests.post(FASTAPI_URL, files=files)
+
+    if response.status_code == 200:
+        return response.json()["answer"]
+    else:
+        return "Erreur backend."
+
+with gr.Blocks() as app:
+    gr.Markdown("# Assistant Vocal – Gradio Frontend")
+
+    audio_input = gr.Audio(
+        sources=["microphone"],
+        type="numpy",
+        label="Clique pour enregistrer / arrêter",
+        interactive=True,
+    )
+
+    button = gr.Button("Envoyer la question")
+    output = gr.Textbox(label="Réponse")
+
+    button.click(send_audio, inputs=audio_input, outputs=output)
+
+app.launch()
