@@ -15,7 +15,7 @@ class ASRService:
 
         # Lire le fichier WAV depuis les bytes
         audio_file = io.BytesIO(audio_bytes)
-        audio, sr = sf.read(audio_file)  # Doit être déjà 16 kHz mono
+        audio, sr = sf.read(audio_file, dtype="float32")  # Doit être déjà 16 kHz mono
 
         # Transcription directe
         result = self.model.transcribe(audio, fp16=False)
