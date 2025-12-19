@@ -14,20 +14,9 @@ def send_audio(audio):
 
     sr, data = audio
 
-    # Gradio fournit un numpy array → convertir en WAV en mémoire
+    # # Gradio fournit un numpy array → convertir en WAV en mémoire
     import soundfile as sf
     import io
-    import numpy as np
-
-    if sr != 16000:
-        from scipy.signal import resample
-        num_samples = int(len(data) * 16000 / sr)
-        data = resample(data, num_samples)
-        sr = 16000
-
-    # Convert to mono if necessary
-    if len(data.shape) > 1:  # If stereo, average the channels
-        data = np.mean(data, axis=1)
 
     buffer = io.BytesIO()
     sf.write(buffer, data, sr, format="WAV")
@@ -37,7 +26,7 @@ def send_audio(audio):
     response = requests.post(FASTAPI_URL, files=files)
 
     if response.status_code == 200:
-        return response.json()["transcription"] + "cool"
+        return response.json()["transcription"]
     else:
         return  f"Erreur backend. Status code: {response.status_code}, Content: {response.content}"
 
