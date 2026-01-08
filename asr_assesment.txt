@@ -1,0 +1,42 @@
+Faire lire les phrases suivantes par plusieurs personnes différentes et mesurer la latence et le word error rate : 
+
+"Bonjour, peux-tu me dire quel temps il fera demain à Paris ?"
+
+B1 : Bonjour, peux-tu me dire qu'elle t'en le fera demain à Paris ? Temps : 19.962 s
+
+
+"J’aimerais réserver une table pour deux personnes ce vendredi soir à vingt heures."
+
+B1 : J'aimerais réserver une table pour deux personnes secondes d'histoire à 20h. Temps : 20.344 s
+
+"Le chiffre d’affaires a augmenté de 12,5 % au troisième trimestre 2024."
+
+B1 : Le chiffre doit faire augmenter de 12,5 % au troisième trimestre 2024. Temps : 19.944 s
+
+"Est-ce que tu peux répéter exactement ce que j’ai dit il y a quelques secondes ?"
+
+B1 : Est-ce que je peux répéter exactement ce que j'ai dit il y a tout ce que seconde ? Temps : 20.971 s
+
+"Les chaussettes sèchent sur le sèche-linge alors que le chat chasse une mouche."
+
+B1 : ELes chaussettes sèches sur le sèchelin, alors que le châche a submouge. Temps : 21.430 s
+
+"Quand j’étais enfant, je croyais que les nuages suivaient toujours la voiture."
+
+B1 : Quand j'étais enfant je croyais que les nuages suivaient toujours la voiture. Temps : 19.938 s
+
+"L’intelligence artificielle transforme progressivement la médecine, l’éducation et l’industrie."
+
+B1 : L'intelligence artificielle transforme progressivement la médecine, l'éducation et l'industrie. Temps : 21.913 s
+
+"Cent soixante-dix-sept scientifiques suisses se sont réunis à Zürich en août."
+
+B1 : 177 scientifiques suisses sont réunies à Zurich en août. Temps : 20.504 s
+
+"Si je parle plus vite maintenant est-ce que la transcription reste correcte sans retard ?"
+
+B1 : Si je parle plus vite maintenant, est-ce que la transcription reste correcte sans retard ? Temps : 20.259 s
+
+"D’abord je dis une phrase courte, puis j’enchaîne avec une seconde beaucoup plus longue afin de tester le temps de réponse du système."
+
+B1 : D'abord je dis une phrase courte puis j'enchaîne avec une seconde beaucoup plus longue afin de tester le temps de réponse du système. Temps : 20.510 s

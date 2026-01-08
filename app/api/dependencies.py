@@ -30,23 +30,23 @@ def get_asr():
     return ASRService()
 
 
-@lru_cache(maxsize=1)
-def get_llm():
-    cfg = LLMConfig(
-        model_path=LLM_MODEL_PATH,
-        n_ctx=LLM_N_CTX,
-        n_gpu_layers=LLM_N_GPU_LAYERS,
-        max_tokens=LLM_MAX_TOKENS,
-    )
-    return LLMService(cfg)
+# @lru_cache(maxsize=1)
+# def get_llm():
+#     cfg = LLMConfig(
+#         model_path=LLM_MODEL_PATH,
+#         n_ctx=LLM_N_CTX,
+#         n_gpu_layers=LLM_N_GPU_LAYERS,
+#         max_tokens=LLM_MAX_TOKENS,
+#     )
+#     return LLMService(cfg)
 
 
-@lru_cache(maxsize=1)
-def get_tts():
-    cfg = TTSConfig(
-        piper_bin=PIPER_BIN,
-        model_path=PIPER_MODEL_PATH,
-        config_path=PIPER_CONFIG_PATH,
-        length_scale=PIPER_LENGTH_SCALE,
-    )
-    return TTSService(cfg)
+# @lru_cache(maxsize=1)
+# def get_tts():
+#     cfg = TTSConfig(
+#         piper_bin=PIPER_BIN,
+#         model_path=PIPER_MODEL_PATH,
+#         config_path=PIPER_CONFIG_PATH,
+#         length_scale=PIPER_LENGTH_SCALE,
+#     )
+#     return TTSService(cfg)
