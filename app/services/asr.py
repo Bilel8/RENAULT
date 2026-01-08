@@ -11,10 +11,6 @@ class ASRService:
         self.model = whisper.load_model("base")
 
     def transcribe(self, audio_bytes: bytes) -> str:
-        """
-        Transcrit un fichier WAV PCM 16 kHz mono déjà compatible Whisper.
-        Aucun besoin de ffmpeg ou de conversion.
-        """
 
         audio_file = io.BytesIO(audio_bytes)
         audio, sr = sf.read(audio_file, dtype="float32")
@@ -37,9 +33,10 @@ class ASRService:
 
         mel = whisper.log_mel_spectrogram(audio).to(self.model.device)
 
-        options = whisper.DecodingOptions(fp16=False,
+        options = whisper.DecodingOptions(fp16=True,
                                         task='transcribe',
                                         language='fr')
         result = whisper.decode(self.model, mel, options)
+        print(self.model.device)
 
         return result.text

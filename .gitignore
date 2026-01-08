@@ -1,5 +1,7 @@
 chatbot_venv/
 __pycache__/
+models/
 *.pyc
 *.pyo
 *.pyd
+old_asr/
