@@ -15,7 +15,7 @@ class LLMConfig:
     model_path: str
     n_ctx: int = 2048
     n_threads: int = max(os.cpu_count() or 4, 4)
-    n_gpu_layers: int = 0  # commence à 0 (stable) puis augmente si ton build supporte le GPU
+    n_gpu_layers: int = 0
     temperature: float = 0.2
     top_p: float = 0.95
     max_tokens: int = 256
