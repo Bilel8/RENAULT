@@ -35,9 +35,10 @@ def send_audio(audio):
         answer = data.get("answer", "")
 
         audio_path = None
-        audio_hex = data.get("audio_reply")
-        if audio_hex :
-            audio_bytes = bytes.fromhex(audio_hex)
+        audio_b64 = data.get("audio_reply")
+        if audio_b64 :
+            import base64
+            audio_bytes = base64.b64decode(audio_b64)
             tmp = tempfile.NamedTemporaryFile(suffix=".wav", delete=False)
             tmp.write(audio_bytes)
             tmp.close()

@@ -5,18 +5,12 @@ from app.services.llm import LLMService, LLMConfig
 from app.services.tts import TTSService, TTSConfig
 
 
-# CONFIG LLM 
-
-LLM_MODEL_PATH = ("/home/virgaux/Desktop/chatbot/models/model_llm/""qwen2.5-3b-instruct-q4_k_m.gguf")
-LLM_N_CTX = 2048
-LLM_N_GPU_LAYERS = 0
-LLM_MAX_TOKENS = 256
-
-# CONFIG TTS 
-PIPER_BIN = "piper"
-PIPER_MODEL_PATH = "/home/virgaux/Desktop/chatbot/models/model_tts/fr_FR-upmc-medium.onnx"
-PIPER_CONFIG_PATH = "/home/virgaux/Desktop/chatbot/models/model_tts/fr_FR-upmc-medium.onnx.json"
-PIPER_LENGTH_SCALE = 1.0  
+from app.config import (
+    LLM_MODEL_PATH, LLM_N_CTX, LLM_N_GPU_LAYERS, LLM_MAX_TOKENS, 
+    LLM_TEMPERATURE, LLM_TOP_P, LLM_SYSTEM_PROMPT, LLM_N_THREADS,
+    PIPER_BIN, PIPER_MODEL_PATH, PIPER_CONFIG_PATH, PIPER_LENGTH_SCALE,
+    ASR_MODEL_NAME
+)
 
 
 @lru_cache(maxsize=1)
@@ -26,8 +20,7 @@ def get_rag():
 
 @lru_cache(maxsize=1)
 def get_asr():
-    # Charge Whisper une seule fois
-    return ASRService()
+    return ASRService(model_name=ASR_MODEL_NAME)
 
 
 @lru_cache(maxsize=1)
@@ -35,8 +28,12 @@ def get_llm():
     cfg = LLMConfig(
         model_path=LLM_MODEL_PATH,
         n_ctx=LLM_N_CTX,
+        n_threads=LLM_N_THREADS,
         n_gpu_layers=LLM_N_GPU_LAYERS,
         max_tokens=LLM_MAX_TOKENS,
+        temperature=LLM_TEMPERATURE,
+        top_p=LLM_TOP_P,
+        system_prompt=LLM_SYSTEM_PROMPT
     )
     return LLMService(cfg)
 

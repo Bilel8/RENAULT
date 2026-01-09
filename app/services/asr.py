@@ -6,9 +6,9 @@ from scipy.signal import resample
 
 
 class ASRService:
-    def __init__(self):
+    def __init__(self, model_name: str = "base"):
         # Charge un modèle Whisper une seule fois
-        self.model = whisper.load_model("base")
+        self.model = whisper.load_model(model_name)
 
     def transcribe(self, audio_bytes: bytes) -> str:
 
@@ -37,6 +37,6 @@ class ASRService:
                                         task='transcribe',
                                         language='fr')
         result = whisper.decode(self.model, mel, options)
-        print(self.model.device)
+
 
         return result.text

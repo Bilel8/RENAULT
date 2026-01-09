@@ -4,10 +4,13 @@ import os
 
 try:
     from llama_cpp import Llama
-except ImportError as e:
-    raise ImportError(
-        "Installe llama-cpp-python : pip install llama-cpp-python"
-    ) from e
+except ImportError:
+    Llama = None
+
+try:
+    from gpt4all import GPT4All
+except ImportError:
+    GPT4All = None
 
 
 @dataclass
@@ -28,17 +31,37 @@ class LLMConfig:
 
 class LLMService:
     def __init__(self, config: LLMConfig):
-        if not os.path.isfile(config.model_path):
-            raise FileNotFoundError(f"Modèle GGUF introuvable: {config.model_path}")
-
         self.cfg = config
-        self.llm = Llama(
-            model_path=self.cfg.model_path,
-            n_ctx=self.cfg.n_ctx,
-            n_threads=self.cfg.n_threads,
-            n_gpu_layers=self.cfg.n_gpu_layers,
-            verbose=False,
-        )
+        self.backend = None
+
+        if Llama is not None:
+            self.backend = "llama_cpp"
+            if not os.path.isfile(config.model_path):
+                 raise FileNotFoundError(f"Modèle GGUF introuvable: {config.model_path}")
+            self.llm = Llama(
+                model_path=self.cfg.model_path,
+                n_ctx=self.cfg.n_ctx,
+                n_threads=self.cfg.n_threads,
+                n_gpu_layers=self.cfg.n_gpu_layers,
+                verbose=False,
+            )
+        elif GPT4All is not None:
+            self.backend = "gpt4all"
+            # GPT4All gère les chemins différemment, souvent juste le nom du fichier ou dossier
+            abs_path = os.path.abspath(config.model_path)
+            model_dir = os.path.dirname(abs_path)
+            model_name = os.path.basename(abs_path)
+            
+            if not os.path.isdir(model_dir):
+                raise FileNotFoundError(f"Dossier de modèle introuvable : {model_dir}")
+            
+            # Message informatif pour l'utilisateur s'il n'a pas le fichier
+            if not os.path.isfile(abs_path) and not os.path.isfile(os.path.join(model_dir, model_name)):
+                 print(f"ATTENTION: Le modèle '{model_name}' semble absent de '{model_dir}'. GPT4All va peut-être échouer.")
+
+            self.llm = GPT4All(model_name, model_path=model_dir, allow_download=False)
+        else:
+             raise ImportError("Aucun backend LLM trouvé. Installez 'llama-cpp-python' ou 'gpt4all'.")
 
     def _format_docs(self, docs: Optional[Iterable[Any]]) -> str:
         if not docs:
@@ -73,12 +96,31 @@ class LLMService:
             {"role": "user", "content": user_content},
         ]
 
-        out = self.llm.create_chat_completion(
-            messages=messages,
-            temperature=self.cfg.temperature,
-            top_p=self.cfg.top_p,
-            max_tokens=self.cfg.max_tokens,
-        )
+        if self.backend == "llama_cpp":
+            out = self.llm.create_chat_completion(
+                messages=messages,
+                temperature=self.cfg.temperature,
+                top_p=self.cfg.top_p,
+                max_tokens=self.cfg.max_tokens,
+            )
+            try:
+                return out["choices"][0]["message"]["content"].strip()
+            except Exception:
+                return str(out)
+        
+        elif self.backend == "gpt4all":
+             # GPT4All chat connection is stateful usually, but generate method is simpler?
+             # Actually GPT4All python bindings have .chat_session() or .generate(). 
+             # Let's use simple .generate() but it's checking prompt format.
+             # Better to use chat_session context manager for chat format.
+             with self.llm.chat_session(self.cfg.system_prompt):
+                response = self.llm.generate(
+                    user_content, 
+                    max_tokens=self.cfg.max_tokens, 
+                    temp=self.cfg.temperature,
+                    top_p=self.cfg.top_p 
+                )
+                return response
 
         try:
             return out["choices"][0]["message"]["content"].strip()
