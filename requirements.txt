@@ -8,6 +8,7 @@ numpy
 scipy
 # llama-cpp-python (Requires C++ Build Tools)
 gpt4all
+loguru
 piper-tts
 python-dotenv
 gradio

@@ -1,10 +1,8 @@
 from fastapi import APIRouter, File, Depends, HTTPException
 from app.api.dependencies import get_asr, get_rag, get_llm, get_tts
 from app.models.schemas import ChatResponse
-import logging
+from loguru import logger
 import base64
-
-logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
 
 router = APIRouter()
 
@@ -16,7 +14,7 @@ def voice_chat(
     tts = Depends(get_tts),
 ):
     try:
-        logging.debug(f"Received audio of size: {len(audio)} bytes")
+        logger.debug(f"Received audio of size: {len(audio)} bytes")
         
         # 1. ASR
         transcription = asr.transcribe(audio)
@@ -37,5 +35,5 @@ def voice_chat(
             audio_reply=audio_b64,  
         )
     except Exception as e:
-        logging.error(f"Error in voice_chat: {str(e)}")
+        logger.error(f"Error in voice_chat: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))

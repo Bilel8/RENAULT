@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Any, Iterable, Optional
 import os
+from loguru import logger
 
 try:
     from llama_cpp import Llama
@@ -57,7 +58,7 @@ class LLMService:
             
             # Message informatif pour l'utilisateur s'il n'a pas le fichier
             if not os.path.isfile(abs_path) and not os.path.isfile(os.path.join(model_dir, model_name)):
-                 print(f"ATTENTION: Le modèle '{model_name}' semble absent de '{model_dir}'. GPT4All va peut-être échouer.")
+                 logger.warning(f"ATTENTION: Le modèle '{model_name}' semble absent de '{model_dir}'. GPT4All va peut-être échouer.")
 
             self.llm = GPT4All(model_name, model_path=model_dir, allow_download=False)
         else:

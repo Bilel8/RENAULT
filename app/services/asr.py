@@ -6,7 +6,7 @@ from scipy.signal import resample
 
 
 class ASRService:
-    def __init__(self, model_name: str = "base"):
+    def __init__(self, model_name: str = "small"):
         # Charge un modèle Whisper une seule fois
         self.model = whisper.load_model(model_name)
 
@@ -25,18 +25,14 @@ class ASRService:
 
         audio = audio.astype(np.float32)
 
-        max_length = 30 * 16000
-        if len(audio) > max_length:
-            audio = audio[:max_length]
-        else:
-            audio = np.pad(audio, (0, max_length - len(audio)))
+        # Utilisation de l'API de haut niveau transcribe qui gère:
+        # - Les fichiers longs (sliding window)
+        # - La ponctuation et le formatage automatique
+        # - Pas de limite de 30s
+        # fp16=True est le défaut sur GPU, mais peut générer un warning sur CPU. 
+        # On le garde à True explicitement comme dans l'implémentation précédente si souhaité, 
+        # ou on laisse whisper gérer (par défaut il tente True et fallback si CPU).
+        # Ici on force comme avant, mais on peut le changer si warning.
+        result = self.model.transcribe(audio, language="fr")
 
-        mel = whisper.log_mel_spectrogram(audio).to(self.model.device)
-
-        options = whisper.DecodingOptions(fp16=True,
-                                        task='transcribe',
-                                        language='fr')
-        result = whisper.decode(self.model, mel, options)
-
-
-        return result.text
+        return result["text"]
