@@ -27,3 +27,7 @@ PIPER_LENGTH_SCALE = float(os.getenv("PIPER_LENGTH_SCALE", "1.0"))
 # --- ASR CONFIG ---
 ASR_MODEL_NAME = os.getenv("ASR_MODEL_NAME", "base")
 ASR_SAMPLE_RATE = int(os.getenv("ASR_SAMPLE_RATE", "16000"))
+
+# --- LOGGING CONFIG ---
+LOG_LEVEL = os.getenv("LOG_LEVEL", "DEBUG")
+LOG_FILE_PATH = os.getenv("LOG_FILE_PATH", "logs/app.log")

@@ -7,3 +7,4 @@ models/
 old_asr/
 .env
 .pytest_cache
+logs
