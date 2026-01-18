@@ -3,19 +3,21 @@ from functools import lru_cache
 from app.services.asr import ASRService
 from app.services.llm import LLMService, LLMConfig
 from app.services.tts import TTSService, TTSConfig
+from app.services.rag import RAGService
+
 
 
 from app.config import (
     LLM_MODEL_PATH, LLM_N_CTX, LLM_N_GPU_LAYERS, LLM_MAX_TOKENS, 
     LLM_TEMPERATURE, LLM_TOP_P, LLM_SYSTEM_PROMPT, LLM_N_THREADS,
     PIPER_BIN, PIPER_MODEL_PATH, PIPER_CONFIG_PATH, PIPER_LENGTH_SCALE,
-    ASR_MODEL_NAME
+    ASR_MODEL_NAME, CSV_PATH
 )
 
 
 @lru_cache(maxsize=1)
 def get_rag():
-    return None
+    return RAGService(csv_path=CSV_PATH)
 
 
 @lru_cache(maxsize=1)

@@ -3,6 +3,7 @@ from app.api.dependencies import get_asr, get_rag, get_llm, get_tts
 from app.models.schemas import ChatResponse
 from loguru import logger
 import base64
+from app.config import CSV_PATH
 
 router = APIRouter()
 
@@ -10,6 +11,7 @@ router = APIRouter()
 def voice_chat(
     audio: bytes = File(...),
     asr = Depends(get_asr),
+    rag = Depends(get_rag),
     llm = Depends(get_llm),
     tts = Depends(get_tts),
 ):
@@ -19,9 +21,10 @@ def voice_chat(
         # 1. ASR
         transcription = asr.transcribe(audio)
 
-        # 2. LLM
-        # RAG plus tard ; pour l’instant docs=None
-        answer = llm.generate(transcription, docs=None)
+        context = rag.format_context(query=transcription)
+
+        # 2. LLM RAG plus tard ; pour l’instant docs=None
+        answer = llm.generate(transcription, context=context)
         
         # 3. TTS
         audio_reply = tts.synthesize(answer)

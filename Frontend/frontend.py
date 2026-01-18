@@ -43,7 +43,7 @@ def send_audio(audio, progress=gr.Progress()):
     files = {"audio": ("audio.wav", buffer, "audio/wav")}
     
     try:
-        response = requests.post(FASTAPI_URL, files=files, timeout=30)
+        response = requests.post(FASTAPI_URL, files=files) #, timeout=30
         
         # Étape 3 : Traitement
         progress(0.7, desc="🤖 Traitement de la réponse...")

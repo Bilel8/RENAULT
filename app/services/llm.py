@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Any, Iterable, Optional
 import os
+import csv
 from loguru import logger
 
 try:
@@ -46,6 +47,8 @@ class LLMService:
                 n_gpu_layers=self.cfg.n_gpu_layers,
                 verbose=False,
             )
+
+
         elif GPT4All is not None:
             self.backend = "gpt4all"
             # GPT4All gère les chemins différemment, souvent juste le nom du fichier ou dossier
@@ -80,12 +83,36 @@ class LLMService:
                 parts.append(f"[Doc {i}] {txt}")
         return "\n".join(parts)
 
-    def generate(self, question: str, docs: Optional[list] = None) -> str:
+    def csv_to_text(
+        path: str,
+        max_chars: int = 8000,
+        delimiter: str = ";"
+    ) -> str:
+
+        if not os.path.isfile(path):
+            raise FileNotFoundError(f"CSV introuvable: {path}")
+
+        rows = []
+
+        with open(path, "r", encoding="utf-8", newline="") as f:
+            reader = csv.reader(f, delimiter=delimiter)
+            for i, row in enumerate(reader):
+                rows.append(" | ".join(cell.strip() for cell in row))
+
+        text = "\n".join(rows).strip()
+
+        if len(text) > max_chars:
+            text = text[:max_chars].rstrip() + "\n[...]"
+
+        return text
+
+
+    def generate(self, question: str, context) -> str:
         question = (question or "").strip()
         if not question:
             return "Je n'ai pas reçu de question."
 
-        context = self._format_docs(docs)
+        # context = self._format_docs(context)
         user_content = (
             f"Question: {question}\n"
             + (f"\nContexte:\n{context}\n" if context else "\n")

@@ -3,12 +3,14 @@ import soundfile as sf
 import io
 import numpy as np
 from scipy.signal import resample
+import torch
 
 
 class ASRService:
     def __init__(self, model_name: str = "small"):
         # Charge un modèle Whisper une seule fois
-        self.model = whisper.load_model(model_name)
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.model = whisper.load_model(model_name, device = self.device)
 
     def transcribe(self, audio_bytes: bytes) -> str:
 
@@ -34,5 +36,5 @@ class ASRService:
         # ou on laisse whisper gérer (par défaut il tente True et fallback si CPU).
         # Ici on force comme avant, mais on peut le changer si warning.
         result = self.model.transcribe(audio, language="fr")
-
+        
         return result["text"]
