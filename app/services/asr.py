@@ -36,5 +36,5 @@ class ASRService:
         # ou on laisse whisper gérer (par défaut il tente True et fallback si CPU).
         # Ici on force comme avant, mais on peut le changer si warning.
         result = self.model.transcribe(audio, language="fr")
-        
+
         return result["text"]

@@ -1,24 +1,34 @@
 import pandas as pd
-from rank_bm25 import BM25Okapi
+import numpy as np
+from sentence_transformers import SentenceTransformer
 
 
 class RAGService:
-    def __init__(self, csv_path: str):
+    def __init__(self, csv_path: str, model_name: str = "sentence-transformers/all-MiniLM-L6-v2"):
         df = pd.read_csv(csv_path, sep=";")
-        self.rows = df.astype(str).agg(" | ".join, axis=1).tolist()
-        self.corpus = [r.lower().split() for r in self.rows]
-        self.bm25 = BM25Okapi(self.corpus)
+        self.rows = df.astype(str).agg(";".join, axis=1).tolist()
+
+        # df = df.fillna("")
+
+        # # Prefix each cell with its column name (including empty strings)
+        # for col in df.columns:
+        #     df[col] = col + " : " + df[col].astype(str)
+
+        # self.rows = df.astype(str).agg(";".join, axis=1).tolist()
+
+        self.model = SentenceTransformer(model_name)
+
+        self.embeddings = self.model.encode(self.rows, convert_to_numpy=True, normalize_embeddings=True)
 
     def top_k(self, query: str, k: int = 5):
-        scores = self.bm25.get_scores(query.lower().split())
-        top = sorted(range(len(scores)), key=lambda i: scores[i], reverse=True)[:k]
-        return [(self.rows[i], float(scores[i])) for i in top]
+        if not query:
+            return []
+        q_emb = self.model.encode([query], convert_to_numpy=True, normalize_embeddings=True)[0]
+
+        scores = np.dot(self.embeddings, q_emb)
+        top_idx = np.argsort(scores)[::-1][:k]
+        return [(self.rows[i], float(scores[i])) for i in top_idx]
 
     def format_context(self, query: str, k: int = 5) -> str:
         hits = self.top_k(query, k)
-        # return "\n".join(
-        #     [f"[CSV {i+1} | score={s:.2f}] {row}" for i, (row, s) in enumerate(hits)]
-        # )
-        return "\n".join(
-            sum([row + ' | ' for (row, _) in hits], "")
-        )
+        return "".join([row + "|" for (row, _) in hits])

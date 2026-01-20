@@ -6,9 +6,9 @@ load_dotenv()
 # --- LLM CONFIG ---
 LLM_MODEL_PATH = os.getenv(
     "LLM_MODEL_PATH",
-    "/home/virgaux/Desktop/chatbot/models/model_llm/qwen2.5-1.5b-instruct-q4_k_m.gguf"
+    r"C:\Users\Broni\OneDrive\Bureau\Ponts\3A\projet_renault\models\llm\qwen2.5-3b-instruct-q5_k_m.gguf"
 )
-LLM_N_CTX = int(os.getenv("LLM_N_CTX", "512"))
+LLM_N_CTX = int(os.getenv("LLM_N_CTX", "1028"))
 LLM_N_THREADS = int(os.getenv("LLM_N_THREADS", "4"))
 LLM_N_GPU_LAYERS = int(os.getenv("LLM_N_GPU_LAYERS", "0"))
 LLM_MAX_TOKENS = int(os.getenv("LLM_MAX_TOKENS", "256"))
@@ -25,11 +25,11 @@ LLM_SYSTEM_PROMPT = os.getenv(
 PIPER_BIN = os.getenv("PIPER_BIN", "piper")
 PIPER_MODEL_PATH = os.getenv(
     "PIPER_MODEL_PATH",
-    "/home/virgaux/Desktop/chatbot/models/model_tts/fr_FR-upmc-medium.onnx"
+    r"C:\Users\Broni\OneDrive\Bureau\Ponts\3A\projet_renault\models\tts\fr-gilles-low.onnx"
 )
 PIPER_CONFIG_PATH = os.getenv(
     "PIPER_CONFIG_PATH",
-    "/home/virgaux/Desktop/chatbot/models/model_tts/fr_FR-upmc-medium.onnx.json"
+    r"C:\Users\Broni\OneDrive\Bureau\Ponts\3A\projet_renault\models\tts\fr-gilles-low.onnx.json"
 )
 PIPER_LENGTH_SCALE = float(os.getenv("PIPER_LENGTH_SCALE", "1.0"))
 
@@ -42,4 +42,4 @@ LOG_LEVEL = os.getenv("LOG_LEVEL", "DEBUG")
 LOG_FILE_PATH = os.getenv("LOG_FILE_PATH", "logs/app.log")
 
 
-CSV_PATH = "/home/virgaux/Desktop/chatbot/bdd.csv"
+CSV_PATH = r"C:\Users\Broni\OneDrive\Bureau\Ponts\3A\projet_renault\projets_IA.csv"
