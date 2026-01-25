@@ -130,3 +130,33 @@ class LLMService:
             )
         except Exception:
             return str(out)
+
+    def generate_with_system(self, system_prompt: str, user_content: str) -> str:
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_content},
+        ]
+
+        if self.backend == "llama_cpp":
+            out = self.llm.create_chat_completion(
+                messages=messages,
+                temperature=self.cfg.temperature,
+                top_p=self.cfg.top_p,
+                max_tokens=self.cfg.max_tokens,
+            )
+            try:
+                return out["choices"][0]["message"]["content"].strip()
+            except Exception:
+                return str(out)
+
+        elif self.backend == "gpt4all":
+            with self.llm.chat_session(system_prompt):
+                return self.llm.generate(
+                    user_content,
+                    max_tokens=self.cfg.max_tokens,
+                    temp=self.cfg.temperature,
+                    top_p=self.cfg.top_p,
+                )
+
+        return ""
+
