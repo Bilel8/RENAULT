@@ -1,27 +1,48 @@
-from fastapi import APIRouter, File, Depends
+from fastapi import APIRouter, File, Depends, HTTPException
 from app.api.dependencies import get_asr, get_rag, get_llm, get_tts
 from app.models.schemas import ChatResponse
-import logging
-logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
+from loguru import logger
+import base64
+from app.config import CSV_PATH
 
 router = APIRouter()
 
+
 @router.post("/chat", response_model=ChatResponse)
-async def voice_chat(
+def voice_chat(
     audio: bytes = File(...),
-    asr = Depends(get_asr),
-    llm = Depends(get_llm),
-    tts = Depends(get_tts),
+    asr=Depends(get_asr),
+    rag=Depends(get_rag),
+    llm=Depends(get_llm),
+    tts=Depends(get_tts),
 ):
-    logging.debug(f"Received audio of size: {len(audio)} bytes")
-    transcription = asr.transcribe(audio)
+    try:
+        logger.debug(f"Received audio of size: {len(audio)} bytes")
 
-    # RAG plus tard ; pour l’instant docs=None
-    answer = llm.generate(transcription, docs=None)
-    audio_reply = tts.synthesize(answer)
+        # 1. ASR
+        transcription = asr.transcribe(audio)
 
-    return ChatResponse(
-        transcription=transcription,
-        answer=answer,
-        audio_reply=audio_reply.hex(),  
-    )
+        sql_prompt = rag.schema_prompt()
+        sql_query = llm.generate_with_system(
+            sql_prompt,
+            f"Question: {transcription}\nRetourne seulement la requete SQL."
+        )
+
+        context = rag.format_context_from_sql(sql_query)
+
+        answer = llm.generate(transcription, context=context)
+
+        # 3. TTS
+        audio_reply = tts.synthesize(answer)
+
+        # 4. Encoding Base64
+        audio_b64 = base64.b64encode(audio_reply).decode("utf-8")
+
+        return ChatResponse(
+            transcription=transcription,
+            answer=answer,
+            audio_reply=audio_b64,
+        )
+    except Exception as e:
+        logger.error(f"Error in voice_chat: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
